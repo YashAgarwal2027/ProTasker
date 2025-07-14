@@ -66,6 +66,24 @@ const Home = () => {
     }
   };
 
+  const handleDelete = async (taskId) => {
+    const token = localStorage.getItem("token");
+    try {
+      await axios.delete(`http://localhost:5000/api/tasks/${taskId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      // Remove the deleted task from state
+      setTasks((prevTasks) => prevTasks.filter((task) => task._id !== taskId));
+    } catch (error) {
+      console.error("Error deleting task:", error);
+      setError("Failed to delete task.");
+    }
+  };
+  
+
   if (loading) return <p className="text-center mt-10">Loading tasks...</p>;
   if (error) return <p className="text-center mt-10 text-red-500">{error}</p>;
 
@@ -133,7 +151,15 @@ const Home = () => {
         <ul className="space-y-4">
           {tasks.map((task) => (
             <li key={task._id} className="bg-white p-4 rounded shadow">
-              <h3 className="text-xl font-semibold">{task.title}</h3>
+              <div className="flex justify-between items-center">
+               <h3 className="text-xl font-semibold">{task.title}</h3>
+               <button
+                onClick={() => handleDelete(task._id)}
+                className="ml-4 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm"
+               >
+               Delete
+              </button>
+              </div>  
               <p className="text-sm text-gray-600">{task.description}</p>
               <p className="text-sm">
                 Priority: <span className="font-medium">{task.priority}</span>
