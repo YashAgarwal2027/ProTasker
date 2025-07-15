@@ -12,9 +12,16 @@ const Home = () => {
     priority: "Medium",
     dueDate: ""
   });
+  const [editTaskId, setEditTaskId] = useState(null);
+  const [editForm, setEditForm] = useState({
+  title: "",
+  description: "",
+  priority: "",
+  dueDate: "",
+  });
 
   const navigate = useNavigate();
-
+  const [showForm, setShowForm] = useState(false);
   const logout = () => {
     localStorage.removeItem("token");
     navigate("/login");
@@ -82,8 +89,51 @@ const Home = () => {
       setError("Failed to delete task.");
     }
   };
-  
+  // When the Edit button is clicked, we’ll load that task into the form:
+  const handleEditClick = (task) => {
+    setEditTaskId(task._id);
+    setEditForm({
+      title: task.title,
+      description: task.description,
+      priority: task.priority,
+      dueDate: task.dueDate.split("T")[0], // to fit input type="date"
+    });
+  };
+  //This update the edit form inputs:
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
+  // this will send a PUT request to update the task:
+  const handleUpdateTask = async (id) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await axios.put(
+        `http://localhost:5000/api/tasks/${id}`,
+        editForm,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      // Update local task list
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task._id === id ? response.data : task
+        )
+      );
+      setEditTaskId(null); // Exit edit mode
+    } catch (err) {
+      console.error("Update failed:", err);
+      setError("Failed to update task.");
+    }
+  };
+  
   if (loading) return <p className="text-center mt-10">Loading tasks...</p>;
   if (error) return <p className="text-center mt-10 text-red-500">{error}</p>;
 
@@ -149,27 +199,89 @@ const Home = () => {
         <p className="text-gray-600">No tasks yet. Start adding some!</p>
       ) : (
         <ul className="space-y-4">
-          {tasks.map((task) => (
-            <li key={task._id} className="bg-white p-4 rounded shadow">
-              <div className="flex justify-between items-center">
-               <h3 className="text-xl font-semibold">{task.title}</h3>
-               <button
-                onClick={() => handleDelete(task._id)}
-                className="ml-4 bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm"
-               >
-               Delete
-              </button>
-              </div>  
-              <p className="text-sm text-gray-600">{task.description}</p>
-              <p className="text-sm">
-                Priority: <span className="font-medium">{task.priority}</span>
-              </p>
-              <p className="text-sm">Due: {new Date(task.dueDate).toDateString()}</p>
-              <p className="text-sm text-green-600">
-                {task.completed ? "Completed" : "Pending"}
-              </p>
-            </li>
-          ))}
+         {tasks.map((task) => (
+  <li key={task._id} className="bg-white p-4 rounded shadow">
+    {editTaskId === task._id ? (
+      // Editable Form UI
+      <div className="space-y-2">
+        <input
+          type="text"
+          name="title"
+          value={editForm.title}
+          onChange={handleEditChange}
+          className="w-full border p-2 rounded"
+        />
+        <textarea
+          name="description"
+          value={editForm.description}
+          onChange={handleEditChange}
+          className="w-full border p-2 rounded"
+        ></textarea>
+        <select
+          name="priority"
+          value={editForm.priority}
+          onChange={handleEditChange}
+          className="w-full border p-2 rounded"
+        >
+          <option value="High">High</option>
+          <option value="Medium">Medium</option>
+          <option value="Low">Low</option>
+        </select>
+        <input
+          type="date"
+          name="dueDate"
+          value={editForm.dueDate}
+          onChange={handleEditChange}
+          className="w-full border p-2 rounded"
+        />
+        <div className="flex space-x-2">
+          <button
+            onClick={() => handleUpdateTask(task._id)}
+            className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+          >
+            Save
+          </button>
+          <button
+            onClick={() => setEditTaskId(null)}
+            className="bg-gray-400 text-white px-3 py-1 rounded hover:bg-gray-500"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ) : (
+      // Normal display UI
+      <>
+        <div className="flex justify-between items-center">
+          <h3 className="text-xl font-semibold">{task.title}</h3>
+          <div className="space-x-2">
+            <button
+              onClick={() => handleEditClick(task)}
+              className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm"
+            >
+              Edit
+            </button>
+            <button
+              onClick={() => handleDelete(task._id)}
+              className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+        <p className="text-sm text-gray-600">{task.description}</p>
+        <p className="text-sm">
+          Priority: <span className="font-medium">{task.priority}</span>
+        </p>
+        <p className="text-sm">Due: {new Date(task.dueDate).toDateString()}</p>
+        <p className="text-sm text-green-600">
+          {task.completed ? "Completed" : "Pending"}
+        </p>
+      </>
+    )}
+   </li>
+  ))}
+ 
         </ul>
       )}
     </div>
