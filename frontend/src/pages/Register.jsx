@@ -22,12 +22,7 @@ const Register = () => {
 
     try {
       const response = await axios.post("http://localhost:5000/api/users/register", formData);
-      console.log(response.data);
-
-      // Store the token in localStorage (optional for now)
       localStorage.setItem("token", response.data.token);
-
-      // Redirect to login page
       navigate("/login");
     } catch (err) {
       console.error(err);
@@ -37,10 +32,16 @@ const Register = () => {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-white p-4">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center text-blue-600">Create an Account</h2>
+      <div className="bg-white dark:bg-gray-800 dark:text-white p-8 rounded-lg shadow-md w-full max-w-md">
+        <h2 className="text-2xl font-bold mb-6 text-center text-blue-600 dark:text-blue-400">
+          Create an Account
+        </h2>
 
-        {error && <p className="text-red-500 mb-4 text-sm text-center">{error}</p>}
+        {error && (
+          <p className="text-red-500 dark:text-red-400 mb-4 text-sm text-center">
+            {error}
+          </p>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -51,7 +52,8 @@ const Register = () => {
               value={formData.name}
               onChange={handleChange}
               placeholder="Your name"
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              required
             />
           </div>
 
@@ -63,7 +65,8 @@ const Register = () => {
               value={formData.email}
               onChange={handleChange}
               placeholder="you@example.com"
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              required
             />
           </div>
 
@@ -75,7 +78,8 @@ const Register = () => {
               value={formData.password}
               onChange={handleChange}
               placeholder="Password"
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              required
             />
           </div>
 

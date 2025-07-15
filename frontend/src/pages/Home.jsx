@@ -22,11 +22,12 @@ const Home = () => {
 
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
+  const [filter, setFilter] = useState("All");
+
   const logout = () => {
     localStorage.removeItem("token");
     navigate("/login");
   };
-  const [filter, setFilter] = useState("All");
 
   const fetchTasks = async () => {
     const token = localStorage.getItem("token");
@@ -37,9 +38,7 @@ const Home = () => {
 
     try {
       const response = await axios.get("http://localhost:5000/api/tasks", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       setTasks(response.data);
     } catch (err) {
@@ -63,9 +62,7 @@ const Home = () => {
 
     try {
       await axios.post("http://localhost:5000/api/tasks", formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       setFormData({
         title: "",
@@ -73,8 +70,8 @@ const Home = () => {
         priority: "Medium",
         dueDate: "",
       });
-      setShowForm(false); // 👈 auto-hide after adding
-      fetchTasks(); // refresh task list
+      setShowForm(false);
+      fetchTasks();
     } catch (err) {
       alert("Failed to add task");
     }
@@ -84,38 +81,29 @@ const Home = () => {
     const token = localStorage.getItem("token");
     try {
       await axios.delete(`http://localhost:5000/api/tasks/${taskId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-
-      // Remove the deleted task from state
-      setTasks((prevTasks) => prevTasks.filter((task) => task._id !== taskId));
-    } catch (error) {
-      console.error("Error deleting task:", error);
+      setTasks((prev) => prev.filter((task) => task._id !== taskId));
+    } catch (err) {
       setError("Failed to delete task.");
     }
   };
-  // When the Edit button is clicked, we’ll load that task into the form:
+
   const handleEditClick = (task) => {
     setEditTaskId(task._id);
     setEditForm({
       title: task.title,
       description: task.description,
       priority: task.priority,
-      dueDate: task.dueDate.split("T")[0], // to fit input type="date"
+      dueDate: task.dueDate.split("T")[0],
     });
   };
-  //This update the edit form inputs:
+
   const handleEditChange = (e) => {
     const { name, value } = e.target;
-    setEditForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setEditForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // this will send a PUT request to update the task:
   const handleUpdateTask = async (id) => {
     const token = localStorage.getItem("token");
     try {
@@ -123,18 +111,14 @@ const Home = () => {
         `http://localhost:5000/api/tasks/${id}`,
         editForm,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
-      // Update local task list
-      setTasks((prevTasks) =>
-        prevTasks.map((task) => (task._id === id ? response.data : task))
+      setTasks((prev) =>
+        prev.map((task) => (task._id === id ? response.data : task))
       );
-      setEditTaskId(null); // Exit edit mode
+      setEditTaskId(null);
     } catch (err) {
-      console.error("Update failed:", err);
       setError("Failed to update task.");
     }
   };
@@ -146,16 +130,13 @@ const Home = () => {
         `http://localhost:5000/api/tasks/${task._id}`,
         { ...task, completed: !task.completed },
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
-      setTasks((prevTasks) =>
-        prevTasks.map((t) => (t._id === task._id ? response.data : t))
+      setTasks((prev) =>
+        prev.map((t) => (t._id === task._id ? response.data : t))
       );
-    } catch (error) {
-      console.error("Failed to toggle completion:", error);
+    } catch (err) {
       setError("Unable to update completion status.");
     }
   };
@@ -168,7 +149,9 @@ const Home = () => {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold">Your Tasks</h1>
-          <p className="text-lg text-gray-700 mt-1">Manage Your Tasks</p>
+          <p className="text-lg text-gray-700 dark:text-gray-300 mt-1">
+            Manage Your Tasks
+          </p>
         </div>
         <div className="space-x-2">
           <button
@@ -185,11 +168,12 @@ const Home = () => {
           </button>
         </div>
       </div>
+
       {/* Task Form */}
       {showForm && (
         <form
           onSubmit={handleSubmit}
-          className="bg-white p-4 rounded shadow mb-6 space-y-4"
+          className="bg-white dark:bg-gray-800 p-4 rounded shadow mb-6 space-y-4"
         >
           <input
             type="text"
@@ -197,7 +181,7 @@ const Home = () => {
             placeholder="Title"
             value={formData.title}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded dark:bg-gray-700 dark:text-white"
             required
           />
           <textarea
@@ -205,14 +189,14 @@ const Home = () => {
             placeholder="Description"
             value={formData.description}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded dark:bg-gray-700 dark:text-white"
             required
           ></textarea>
           <select
             name="priority"
             value={formData.priority}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded dark:bg-gray-700 dark:text-white"
           >
             <option value="High">High</option>
             <option value="Medium">Medium</option>
@@ -223,7 +207,7 @@ const Home = () => {
             name="dueDate"
             value={formData.dueDate}
             onChange={handleChange}
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded dark:bg-gray-700 dark:text-white"
             required
           />
           <button
@@ -234,6 +218,8 @@ const Home = () => {
           </button>
         </form>
       )}
+
+      {/* Filter Buttons */}
       <div className="flex space-x-2 mb-4">
         {["All", "Completed", "Not Completed"].map((option) => (
           <button
@@ -242,7 +228,7 @@ const Home = () => {
             className={`px-4 py-1 rounded text-sm font-medium ${
               filter === option
                 ? "bg-blue-600 text-white"
-                : "bg-gray-300 text-gray-700 hover:bg-gray-400"
+                : "bg-gray-300 dark:bg-gray-700 dark:text-white hover:bg-gray-400"
             }`}
           >
             {option}
@@ -252,7 +238,9 @@ const Home = () => {
 
       {/* Task List */}
       {tasks.length === 0 ? (
-        <p className="text-gray-600">No tasks yet. Start adding some!</p>
+        <p className="text-gray-600 dark:text-gray-300">
+          No tasks yet. Start adding some!
+        </p>
       ) : (
         <ul className="space-y-4">
           {[...tasks]
@@ -266,41 +254,38 @@ const Home = () => {
                 const dateA = new Date(a.dueDate);
                 const dateB = new Date(b.dueDate);
                 if (dateA - dateB !== 0) return dateA - dateB;
-          
-                // If same due date, use priority order: High < Medium < Low
                 const priorityOrder = { High: 1, Medium: 2, Low: 3 };
                 return priorityOrder[a.priority] - priorityOrder[b.priority];
               }
-              return a.completed - b.completed; // default sort: incomplete first
+              return a.completed - b.completed;
             })
             .map((task) => (
               <li
                 key={task._id}
-                className={`bg-white p-4 rounded shadow transition-opacity ${
+                className={`bg-white dark:bg-gray-800 p-4 rounded shadow transition-opacity ${
                   task.completed ? "opacity-50" : ""
                 }`}
               >
                 {editTaskId === task._id ? (
-                  // Editable Task UI
                   <div className="space-y-2">
                     <input
                       type="text"
                       name="title"
                       value={editForm.title}
                       onChange={handleEditChange}
-                      className="w-full border p-2 rounded"
+                      className="w-full border p-2 rounded dark:bg-gray-700 dark:text-white"
                     />
                     <textarea
                       name="description"
                       value={editForm.description}
                       onChange={handleEditChange}
-                      className="w-full border p-2 rounded"
+                      className="w-full border p-2 rounded dark:bg-gray-700 dark:text-white"
                     ></textarea>
                     <select
                       name="priority"
                       value={editForm.priority}
                       onChange={handleEditChange}
-                      className="w-full border p-2 rounded"
+                      className="w-full border p-2 rounded dark:bg-gray-700 dark:text-white"
                     >
                       <option value="High">High</option>
                       <option value="Medium">Medium</option>
@@ -311,7 +296,7 @@ const Home = () => {
                       name="dueDate"
                       value={editForm.dueDate}
                       onChange={handleEditChange}
-                      className="w-full border p-2 rounded"
+                      className="w-full border p-2 rounded dark:bg-gray-700 dark:text-white"
                     />
                     <div className="flex space-x-2">
                       <button
@@ -360,15 +345,17 @@ const Home = () => {
                           onClick={() => handleToggleComplete(task)}
                           className={`px-3 py-1 rounded text-sm ${
                             task.completed
-                              ? "bg-yellow-500 hover:bg-yellow-600 text-white"
-                              : "bg-green-500 hover:bg-green-600 text-white"
-                          }`}
+                              ? "bg-yellow-500 hover:bg-yellow-600"
+                              : "bg-green-500 hover:bg-green-600"
+                          } text-white`}
                         >
                           {task.completed ? "Mark Incomplete" : "Mark Complete"}
                         </button>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-600">{task.description}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      {task.description}
+                    </p>
                     <p className="text-sm">
                       Priority:{" "}
                       <span className="font-medium">{task.priority}</span>
