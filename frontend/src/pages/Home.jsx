@@ -164,7 +164,7 @@ const Home = () => {
   if (error) return <p className="text-center mt-10 text-red-500">{error}</p>;
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
+    <div className="min-h-screen bg-gray-100 text-gray-900 dark:bg-gray-900 dark:text-white p-4">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold">Your Tasks</h1>
