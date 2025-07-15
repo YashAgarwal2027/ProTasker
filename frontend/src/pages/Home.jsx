@@ -67,6 +67,7 @@ const Home = () => {
         },
       });
       setFormData({ title: "", description: "", priority: "Medium", dueDate: "" });
+      setShowForm(false); // 👈 auto-hide after adding
       fetchTasks(); // refresh task list
     } catch (err) {
       alert("Failed to add task");
@@ -133,6 +134,28 @@ const Home = () => {
       setError("Failed to update task.");
     }
   };
+
+  const handleToggleComplete = async (task) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await axios.put(
+        `http://localhost:5000/api/tasks/${task._id}`,
+        { ...task, completed: !task.completed },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setTasks((prevTasks) =>
+        prevTasks.map((t) => (t._id === task._id ? response.data : t))
+      );
+    } catch (error) {
+      console.error("Failed to toggle completion:", error);
+      setError("Unable to update completion status.");
+    }
+  };
+  
   
   if (loading) return <p className="text-center mt-10">Loading tasks...</p>;
   if (error) return <p className="text-center mt-10 text-red-500">{error}</p>;
@@ -140,16 +163,29 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-gray-100 p-4">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Your Tasks</h1>
-        <button
-          onClick={logout}
-          className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-        >
-          Logout
-        </button>
-      </div>
+  <div>
+    <h1 className="text-2xl font-bold">Your Tasks</h1>
+    <p className="text-lg text-gray-700 mt-1">Manage Your Tasks</p>
+  </div>
+  <div className="space-x-2">
+    <button
+      onClick={logout}
+      className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+    >
+      Logout
+    </button>
+    <button
+      onClick={() => setShowForm(!showForm)}
+      className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+    >
+      {showForm ? "Close Form" : "+ Add Task"}
+    </button>
+  </div>
+</div>
+
 
       {/* Task Form */}
+    {showForm &&(
       <form onSubmit={handleSubmit} className="bg-white p-4 rounded shadow mb-6 space-y-4">
         <input
           type="text"
@@ -193,6 +229,7 @@ const Home = () => {
           Add Task
         </button>
       </form>
+    )}
 
       {/* Task List */}
       {tasks.length === 0 ? (
@@ -266,6 +303,14 @@ const Home = () => {
               className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm"
             >
               Delete
+            </button>
+            <button
+              onClick={() => handleToggleComplete(task)}
+              className={`ml-2 px-3 py-1 rounded text-sm ${
+              task.completed ? "bg-yellow-500 hover:bg-yellow-600 text-white" : "bg-green-500 hover:bg-green-600 text-white"
+              }`}
+            >
+            {task.completed ? "Mark Incomplete" : "Mark Complete"}
             </button>
           </div>
         </div>
