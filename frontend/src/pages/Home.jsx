@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 const Home = () => {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,7 +37,7 @@ const Home = () => {
     }
 
     try {
-      const response = await axios.get("http://localhost:5000/api/tasks", {
+      const response = await axios.get(`${API_BASE_URL}/api/tasks`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTasks(response.data);
@@ -61,7 +61,7 @@ const Home = () => {
     const token = localStorage.getItem("token");
 
     try {
-      await axios.post("http://localhost:5000/api/tasks", formData, {
+      await axios.post(`${API_BASE_URL}/api/tasks`, formData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setFormData({
@@ -80,7 +80,7 @@ const Home = () => {
   const handleDelete = async (taskId) => {
     const token = localStorage.getItem("token");
     try {
-      await axios.delete(`http://localhost:5000/api/tasks/${taskId}`, {
+      await axios.delete(`${API_BASE_URL}/api/tasks/${taskId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTasks((prev) => prev.filter((task) => task._id !== taskId));
@@ -108,7 +108,7 @@ const Home = () => {
     const token = localStorage.getItem("token");
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/tasks/${id}`,
+        `${API_BASE_URL}/api/tasks/${id}`,
         editForm,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -127,7 +127,7 @@ const Home = () => {
     const token = localStorage.getItem("token");
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/tasks/${task._id}`,
+        `${API_BASE_URL}/api/tasks/${task._id}`,
         { ...task, completed: !task.completed },
         {
           headers: { Authorization: `Bearer ${token}` },
