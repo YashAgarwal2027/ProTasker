@@ -24,6 +24,9 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
         </Routes>
+        <footer className="text-center text-sm text-gray-500 dark:text-gray-400 p-4">
+          © {new Date().getFullYear()} Made with ❤️ by Yash Kumar Agarwal
+        </footer>
       </div>
     </Router>
   );
