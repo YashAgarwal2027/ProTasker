@@ -11,10 +11,28 @@ const Login = () => {
 
   const [error, setError] = useState("");
 
+  // to Handle Guest User-> 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
-
+  const handleGuestLogin = async () => {
+    setError("");
+    const guestCredentials = {
+      email: "guest@protasker.com",
+      password: "guest123",
+    };
+  
+    try {
+      const response = await axios.post(`${API_BASE_URL}/api/users/login`, guestCredentials);
+      localStorage.setItem("token", response.data.token);
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+      setError("Guest login failed");
+    }
+  };
+  
+  // to handle login button for register user->
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -73,7 +91,17 @@ const Login = () => {
           >
             Login
           </button>
+          <button
+            type="button"
+            onClick={handleGuestLogin}
+            className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition mt-2"
+          >
+            Login as Guest
+          </button>
         </form>
+        <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-2">
+           Use Guest login to explore the app without registration.
+        </p>
       </div>
     </div>
   );
