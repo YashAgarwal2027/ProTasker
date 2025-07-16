@@ -18,6 +18,11 @@ function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gray-100 dark:bg-gray-900 dark:text-white transition-colors">
+
+       <div className="bg-blue-600 text-white text-center py-2 font-semibold shadow">
+          ProTasker by Yash Kumar Agarwal
+        </div> 
+
         <Navbar onToggleDark={() => setDarkMode(!darkMode)}/>
         <Routes>
           <Route path="/" element={<Home />} />
