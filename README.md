@@ -7,7 +7,7 @@ A full-stack task manager app built with **React**, **Node.js**, **Express**, an
 👉 [Try it here](https://pro-tasker-vert.vercel.app/login)
 
 Use Guest Login to explore:
-- **Email:** `guest@gmail.com`
+- **Email:** `guest@protasker.com`
 - **Password:** `guest123`
 
 ---
